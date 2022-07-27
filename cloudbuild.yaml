@@ -1,6 +1,20 @@
 steps:
-#- name: 'gcr.io/mlops-353508/zip-tool'
-  #args: [ '-x', '/.git*', '-r', 'zipfile.zip', '.']
-  #dir: Upload to google cloud storage
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['-m', 'cp', 'zipfile.zip', 'gs://mlops-353508-kubeflowpipelines-default'
+  # Install dependencies
+  - name: python
+    entrypoint: pip
+    args: ["install", "-r", "requirements.txt", "--user"]
+    
+  # Compile pipeline
+  - name: 'python'
+    entrypoint: 'python'
+    args: ['main.py']
+    id: 'compile'
+    
+  # Upload compiled pipeline to GCS.
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', 'zipfile.zip', 'gs://mlops-bucket-wineqaulity']
+    id:  'upload'
+    waitFor: ['compile']  
+    
+options:
+ logging: CLOUD_LOGGING_ONLY
