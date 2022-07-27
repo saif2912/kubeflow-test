@@ -1,5 +1,5 @@
 steps:
-#- name: 'gcr.io/mlops-353508/zip-tool
+#- name: 'gcr.io/mlops-353508/zip-tool'
   #args: [ '-x', '/.git*', '-r', 'zipfile.zip', '.']
   #dir: Upload to google cloud storage
 - name: 'gcr.io/cloud-builders/gsutil'
