@@ -12,7 +12,7 @@ steps:
     
   # Upload compiled pipeline to GCS.
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', 'zipfile.zip', 'gs://mlops-bucket-wineqaulity']
+    args: ['cp', 'zipfile.zip', 'gs://mlops-353508-kubeflowpipelines-default']
     id:  'upload'
     waitFor: ['compile']  
     
