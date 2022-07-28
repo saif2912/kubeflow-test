@@ -1,3 +1,5 @@
+#!/bin/usr/python3
+
 !pip uninstall tensorflow --yes
 !pip uninstall tensorflow-io --yes
 !pip install tensorflow-gpu
