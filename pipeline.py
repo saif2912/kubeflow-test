@@ -4,7 +4,7 @@ PIPELINE_NAME="pipelines"
 import os
 PROJECT_DIR=os.path.join(os.path.expanduser("~"),"imported",PIPELINE_NAME)
 print(PROJECT_DIR)
-template copy 
+tfx template copy 
   --pipeline-name={PIPELINE_NAME} \
   --destination-path={PROJECT_DIR} \
   --model=taxi
