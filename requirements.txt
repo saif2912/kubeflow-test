@@ -2,6 +2,6 @@ tensorflow-gpu
 tensorflow-io
 tensorflow
 markupsafe
-kfp== 1.8.12
+kfp
 tfx
 
