@@ -3,3 +3,4 @@ tensorflow-io
 tensorflow
 markupsafe
 tfx[kfp]<2 -- upgrade
+python -- upgrade
