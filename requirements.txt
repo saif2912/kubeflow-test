@@ -4,4 +4,5 @@ tensorflow
 markupsafe
 kfp
 tfx
-
+setuptools
+ez_setup
