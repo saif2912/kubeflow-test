@@ -8,8 +8,8 @@ print(PROJECT_DIR)
   #--pipeline-name={PIPELINE_NAME} \
   #--destination-path={PROJECT_DIR} \
   #--model=taxi
-{sys.executable} -m models.features_test
-{sys.executable} -m models.keras.model_test
+#{sys.executable} -m models.features_test
+#{sys.executable} -m models.keras.model_test
 gsutil cp data/data.csv gs://{GOOGLE_CLOUD_PROJECT}-kubeflowpipelines-default/tfx-template/data/taxi/data.csv
 tfx pipeline create  --pipeline-path=kubeflow_runner.py --endpoint={ENDPOINT} \
 --build-image
