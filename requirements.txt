@@ -2,5 +2,5 @@ tensorflow-gpu
 tensorflow-io
 tensorflow
 markupsafe
-tfx[kfp]<2 -- upgrade
+tfx -- upgrade
 pip -- upgrade
