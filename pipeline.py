@@ -1,121 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ##### Copyright 2020 The TensorFlow Authors.
-
-# In[ ]:
-
-
-#@title Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
-# # Create a TFX pipeline using templates
-
-# Note: We recommend running this tutorial on Google Cloud Vertex AI Workbench. [Launch this notebook on Vertex AI Workbench](https://console.cloud.google.com/vertex-ai/workbench/deploy-notebook?q=download_url%3Dhttps%253A%252F%252Fraw.githubusercontent.com%252Ftensorflow%252Ftfx%252Fmaster%252Fdocs%252Ftutorials%252Ftfx%252Ftemplate.ipynb).
-# 
-# 
-# <div class="devsite-table-wrapper"><table class="tfo-notebook-buttons" align="left">
-# <td><a target="_blank" href="https://www.tensorflow.org/tfx/tutorials/tfx/template">
-# <img src="https://www.tensorflow.org/images/tf_logo_32px.png"/>View on TensorFlow.org</a></td>
-# <td><a target="_blank" href="https://colab.research.google.com/github/tensorflow/tfx/blob/master/docs/tutorials/tfx/template.ipynb">
-# <img src="https://www.tensorflow.org/images/colab_logo_32px.png">Run in Google Colab</a></td>
-# <td><a target="_blank" href="https://github.com/tensorflow/tfx/tree/master/docs/tutorials/tfx/template.ipynb">
-# <img width=32px src="https://www.tensorflow.org/images/GitHub-Mark-32px.png">View source on GitHub</a></td>
-# <td><a href="https://storage.googleapis.com/tensorflow_docs/tfx/docs/tutorials/tfx/template.ipynb"><img src="https://www.tensorflow.org/images/download_logo_32px.png" />Download notebook</a></td>
-# </table></div>
-
-# ## Introduction
-# 
-# This document will provide instructions to create a TensorFlow Extended (TFX) pipeline
-# using *templates* which are provided with TFX Python package.
-# Many of the instructions are Linux shell commands, which will run on an AI Platform Notebooks instance. Corresponding Jupyter Notebook code cells which invoke those commands using `!` are provided.
-# 
-# You will build a pipeline using [Taxi Trips dataset](
-# https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew)
-# released by the City of Chicago. We strongly encourage you to try building
-# your own pipeline using your dataset by utilizing this pipeline as a baseline.
-# 
-
-# ## Step 1. Set up your environment.
-# 
-# AI Platform Pipelines will prepare a development environment to build a pipeline, and a Kubeflow Pipeline cluster to run the newly built pipeline.
-# 
-# **NOTE:** To select a particular TensorFlow version, or select a GPU instance, create a TensorFlow pre-installed instance in AI Platform Notebooks.
-# 
-
-# Install `tfx` python package with `kfp` extra requirement.
-
-# In[1]:
-
-
-#print("hi")
-
-
-# In[2]:
 
 
 get_ipython().system('pip uninstall tensorflow --yes')
 get_ipython().system('pip uninstall tensorflow-io --yes')
-
-
-# In[11]:
-
-
 get_ipython().system('pip install tensorflow-gpu')
 get_ipython().system('pip install --no-deps tensorflow-io')
 # !pip install numpy
-
-
-# In[17]:
-
-
 import sys
 # Use the latest version of pip.
 get_ipython().system('pip install --upgrade pip')
 # Install tfx and kfp Python packages.
 get_ipython().system('pip install --upgrade "tfx[kfp]<2"')
-
-
-# Let's check the versions of TFX.
-
-# In[18]:
-
-
 get_ipython().system('python3 -c "from tfx import version ; print(\'TFX version: {}\'.format(version.__version__))"')
-
-
-# In AI Platform Pipelines, TFX is running in a hosted Kubernetes environment using [Kubeflow Pipelines](https://www.kubeflow.org/docs/pipelines/overview/pipelines-overview/).
-# 
-# Let's set some environment variables to use Kubeflow Pipelines.
-# 
-# First, get your GCP project ID.
-
-# In[19]:
-
-
 # Read GCP project id from env.
 shell_output = get_ipython().getoutput("gcloud config list --format 'value(core.project)' 2>/dev/null")
 GOOGLE_CLOUD_PROJECT=shell_output[0]
 get_ipython().run_line_magic('env', 'GOOGLE_CLOUD_PROJECT={GOOGLE_CLOUD_PROJECT}')
 print("GCP project ID:" + GOOGLE_CLOUD_PROJECT)
-
-
-# We also need to access your KFP cluster. You can access it in your Google Cloud Console under "AI Platform > Pipeline" menu. The "endpoint" of the KFP cluster can be found from the URL of the Pipelines dashboard, or you can get it from the URL of the Getting Started page where you launched this notebook. Let's create an `ENDPOINT` environment variable and set it to the KFP cluster endpoint. **ENDPOINT should contain only the hostname part of the URL.** For example, if the URL of the KFP dashboard is `https://1e9deb537390ca22-dot-asia-east1.pipelines.googleusercontent.com/#/start`, ENDPOINT value becomes `1e9deb537390ca22-dot-asia-east1.pipelines.googleusercontent.com`.
-# 
-# >**NOTE: You MUST set your ENDPOINT value below.**
-
-# In[19]:
-
 
 # This refers to the KFP cluster endpoint
 
@@ -127,36 +30,29 @@ if not ENDPOINT:
 
 # Set the image name as `tfx-pipeline` under the current GCP project.
 
-# In[20]:
+
 
 
 # Docker image name for the pipeline image.
 CUSTOM_TFX_IMAGE='gcr.io/' + GOOGLE_CLOUD_PROJECT + '/tfx-pipeline'
 
 
-# In[22]:
+
 
 
 #pip install -U tensorflow
 
 
-# In[21]:
+
 
 
 PATH = get_ipython().run_line_magic('env', 'PATH')
 get_ipython().run_line_magic('env', 'PATH={PATH}:/home/jupyter/imported')
 
 
-# And, it's done. We are ready to create a pipeline.
 
-# ## Step 2. Copy the predefined template to your project directory.
-# 
 # In this step, we will create a working pipeline project directory and files by copying additional files from a predefined template.
-# 
 # You may give your pipeline a different name by changing the `PIPELINE_NAME` below. This will also become the name of the project directory where your files will be put.
-
-# In[22]:
-
 
 PIPELINE_NAME="pipelines"
 import os
@@ -168,95 +64,41 @@ print(PROJECT_DIR)
 # 
 # The `tfx template copy` CLI command copies predefined template files into your project directory.
 
-# In[23]:
+
 
 
 get_ipython().system('tfx template copy   --pipeline-name={PIPELINE_NAME}   --destination-path={PROJECT_DIR}   --model=taxi')
 
-
-# Change the working directory context in this notebook to the project directory.
-
-# In[24]:
-
-
 get_ipython().run_line_magic('cd', '{PROJECT_DIR}')
 
-
-# >NOTE: Don't forget to change directory in `File Browser` on the left by clicking into the project directory once it is created.
-
-# ## Step 3. Browse your copied source files
-# 
-# The TFX template provides basic scaffold files to build a pipeline, including Python source code, sample data, and Jupyter Notebooks to analyse the output of the pipeline. The `taxi` template uses the same *Chicago Taxi* dataset and ML model as the [Airflow Tutorial](https://www.tensorflow.org/tfx/tutorials/tfx/airflow_workshop).
-# 
-# Here is brief introduction to each of the Python files.
-# -   `pipeline` - This directory contains the definition of the pipeline
-#     -   `configs.py` — defines common constants for pipeline runners
-#     -   `pipeline.py` — defines TFX components and a pipeline
-# -   `models` - This directory contains ML model definitions.
-#     -   `features.py`, `features_test.py` — defines features for the model
-#     -   `preprocessing.py`, `preprocessing_test.py` — defines preprocessing
-#         jobs using `tf::Transform`
-#     -   `estimator` - This directory contains an Estimator based model.
-#         -   `constants.py` — defines constants of the model
-#         -   `model.py`, `model_test.py` — defines DNN model using TF estimator
-#     -   `keras` - This directory contains a Keras based model.
-#         -   `constants.py` — defines constants of the model
-#         -   `model.py`, `model_test.py` — defines DNN model using Keras
-# -   `local_runner.py`, `kubeflow_runner.py` — define runners for each orchestration engine
-# 
-
-# You might notice that there are some files with `_test.py` in their name. These are unit tests of the pipeline and it is recommended to add more unit tests as you implement your own pipelines.
-# You can run unit tests by supplying the module name of test files with `-m` flag. You can usually get a module name by deleting `.py` extension and replacing `/` with `.`.  For example:
-
-# In[14]:
 
 
 get_ipython().system('{sys.executable} -m models.features_test')
 get_ipython().system('{sys.executable} -m models.keras.model_test')
 
 
-# In[13]:
 
 
 ls -l /usr/bin/python
 
 
-# ## Step 4. Run your first TFX pipeline
-# 
-# Components in the TFX pipeline will generate outputs for each run as [ML Metadata Artifacts](https://www.tensorflow.org/tfx/guide/mlmd), and they need to be stored somewhere. You can use any storage which the KFP cluster can access, and for this example we will use Google Cloud Storage (GCS). A default GCS bucket should have been created automatically. Its name will be `<your-project-id>-kubeflowpipelines-default`.
-# 
-
-# Let's upload our sample data to GCS bucket so that we can use it in our pipeline later.
-
-# In[11]:
 
 
 get_ipython().system('gsutil cp data/data.csv gs://{GOOGLE_CLOUD_PROJECT}-kubeflowpipelines-default/tfx-template/data/taxi/data.csv')
 
 
-# Let's create a TFX pipeline using the `tfx pipeline create` command.
-# 
-# >Note: When creating a pipeline for KFP, we need a container image which will be used to run our pipeline. And `skaffold` will build the image for us. Because skaffold pulls base images from the docker hub, it will take 5~10 minutes when we build the image for the first time, but it will take much less time from the second build.
 
-# In[16]:
 
 
 get_ipython().system('pip install markupsafe==2.0.1')
 
 
-# In[25]:
 
 
 get_ipython().system('tfx pipeline create  --pipeline-path=kubeflow_runner.py --endpoint={ENDPOINT} --build-image')
 
 
-# While creating a pipeline, `Dockerfile` will be generated to build a Docker image. Don't forget to add it to the source control system (for example, git) along with other source files.
-# 
-# NOTE: `kubeflow` will be automatically selected as an orchestration engine if `airflow` is not installed and `--engine` is not specified.
-# 
-# Now start an execution run with the newly created pipeline using the `tfx run create` command.
 
-# In[26]:
 
 
 get_ipython().system('tfx run create --pipeline-name={PIPELINE_NAME} --endpoint={ENDPOINT}')
