@@ -2,4 +2,5 @@ tensorflow-gpu
 tensorflow-io
 tensorflow
 markupsafe
+ez_setup
 tfx
