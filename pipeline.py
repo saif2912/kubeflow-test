@@ -137,7 +137,7 @@ CUSTOM_TFX_IMAGE='gcr.io/' + GOOGLE_CLOUD_PROJECT + '/tfx-pipeline'
 # In[22]:
 
 
-pip install -U tensorflow
+#pip install -U tensorflow
 
 
 # In[21]:
