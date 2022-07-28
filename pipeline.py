@@ -3,10 +3,10 @@
 
 
 
-get_ipython().system('pip uninstall tensorflow --yes')
-get_ipython().system('pip uninstall tensorflow-io --yes')
-get_ipython().system('pip install tensorflow-gpu')
-get_ipython().system('pip install --no-deps tensorflow-io')
+#get_ipython().system('pip uninstall tensorflow --yes')
+#get_ipython().system('pip uninstall tensorflow-io --yes')
+#get_ipython().system('pip install tensorflow-gpu')
+#get_ipython().system('pip install --no-deps tensorflow-io')
 # !pip install numpy
 import sys
 # Use the latest version of pip.
