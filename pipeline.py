@@ -5,9 +5,9 @@ import os
 PROJECT_DIR=os.path.join(os.path.expanduser("~"),"imported",PIPELINE_NAME)
 print(PROJECT_DIR)
 tfx template copy \
-  --pipeline-name={PIPELINE_NAME} \
-  --destination-path={PROJECT_DIR} \
-  --model=taxi
+    -- pipeline - name = {PIPELINE_NAME} \
+    --destination - path = {PROJECT_DIR} \
+    --model = taxi
 {sys.executable} -m models.features_test
 {sys.executable} -m models.keras.model_test
 gsutil cp data/data.csv gs://{GOOGLE_CLOUD_PROJECT}-kubeflowpipelines-default/tfx-template/data/taxi/data.csv
